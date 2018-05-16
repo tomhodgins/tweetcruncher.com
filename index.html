@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html data-theme=dark>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<link rel=stylesheet href=https://fonts.googleapis.com/css?family=Fira+Sans:300,400,500,700|Source+Sans+Pro:200,300,400,600,700,900>
+<link rel=stylesheet href=https://tomhodgins.github.io/template-factory/css/basic.css>
+<title>Tweet Cruncher</title>
+
+<style>
+  textarea {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 5em;
+    color: white;
+    background: rgba(0,0,0,.15);
+    font-size: 18pt;
+    font-family: 'Source Sans Pro', sans-serif;
+    border-radius: .2em;
+    border-color: rgba(0,0,0,.3);
+    box-shadow: transparent 0 .15em .3em;
+    transition: border-color .2s ease-in-out,
+                box-shadow .2s ease-in-out;
+  }
+  textarea:hover,
+  textarea:focus {
+    border-color: rgba(0,150,200,1);
+    box-shadow: rgba(0,150,200,.7) 0 0 .5em;
+  }
+</style>
+
+<h1>🐥🔨<br>Tweet Cruncher</h1>
+<h2><strong id=count></strong> Character Substitutions</h2>
+
+<h2>Input</h2>
+<textarea data-persist=tweet id=input placeholder="Enter your text to be tweeted here"></textarea>
+
+<h2>Output</h2>
+<textarea id=output></textarea>
+
+<script>
+    var input = document.getElementById('input')
+    var output = document.getElementById('output')
+    var count = document.getElementById('count')
+    var glyph = [
+
+      // 4 characters
+      {"char": "🔙", "string": "back"},
+      {"char": "🆒", "string": "cool"},
+      {"char": "⨌", "string": "ffff"},
+      {"char": "🆓", "string": "free"},
+      {"char": "㎉", "string": "kcal"},
+      {"char": "ꋗ", "string": "niii"},
+      {"char": "㎮", "string": "rads"},
+      {"char": "🔜", "string": "soon"},
+      {"char": "ⅷ", "string": "viii"},
+
+      // 3 characters
+      {"char": "🝛", "string": "aaa"},
+      {"char": "&", "string": "and"},
+      {"char": "🏧", "string": "atm"},
+      {"char": "㍴", "string": "bar"},
+      {"char": "㎈", "string": "cal"},
+      {"char": "㏆", "string": "ckg"},
+      {"char": "🔚", "string": "end"},
+      {"char": "℻", "string": "fax"},
+      {"char": "∭", "string": "fff"},
+      {"char": "ﬃ", "string": "ffi"},
+      {"char": "ﬄ", "string": "ffl"},
+      {"char": "㎓", "string": "ghz"},
+      {"char": "㎬", "string": "gpa"},
+      {"char": "㍱", "string": "hpa"},
+      {"char": "ﬓ", "string": "ifu"},
+      {"char": "ⅲ", "string": "iii"},
+      {"char": "ꏢ", "string": "ini"},
+      {"char": "ﬖ", "string": "itu"},
+      {"char": "ꏾ", "string": "ixi"},
+      {"char": "㎑", "string": "khz"},
+      {"char": "㎪", "string": "kpa"},
+      {"char": "㏒", "string": "log"},
+      {"char": "㎒", "string": "mhz"},
+      {"char": "㏕", "string": "mil"},
+      {"char": "㏖", "string": "mol"},
+      {"char": "㎫", "string": "mpa"},
+      {"char": "🆕", "string": "new"},
+      {"char": "ꊃ", "string": "nii"},
+      {"char": "ꍞ", "string": "nnn"},
+      {"char": "ၗ", "string": "ous"},
+      {"char": "ဿ", "string": "ooo"},
+      {"char": "ꌴ", "string": "oto"},
+      {"char": "㏙", "string": "ppm"},
+      {"char": "₧", "string": "pts"},
+      {"char": "㎭", "string": "rad"},
+      {"char": "𐅎", "string": "rxt"},
+      {"char": "🆘", "string": "sos"},
+      {"char": "🝜", "string": "sss"},
+      {"char": "℡", "string": "tel"},
+      {"char": "𐅫", "string": "the"},
+      {"char": "🔝", "string": "top"},
+      {"char": "㎔", "string": "thz"},
+      {"char": "ꉕ", "string": "uuo"},
+      {"char": "ﬗ", "string": "utu"},
+      {"char": "ꉒ", "string": "uuu"},
+      {"char": "ⅶ", "string": "vii"},
+      {"char": "ⅻ", "string": "xii"},
+      {"char": "💤", "string": "zzz"},
+      {"char": "💯", "string": "100"},
+      {"char": "…", "string": "\\.\\.\\."},
+      {"char": "≋", "string": "~~~"},
+      {"char": "⩶", "string": "==="},
+      {"char": "⪜", "string": ">=="},
+      {"char": "⪛", "string": "<=="},
+      {"char": "⋘", "string": "<<<"},
+      {"char": "⋙", "string": ">>>"},
+      {"char": "⁂", "string": "\\*\\*\\*"},
+
+      // 2 characters
+      {"char": "ꜳ", "string": "aa"},
+      {"char": "🆎", "string": "ab"},
+      {"char": "℀", "string": "ac"},
+      {"char": "æ", "string": "ae"},
+      {"char": "ᾼ", "string": "ai"},
+      {"char": "㏂", "string": "am"},
+      {"char": "ꜵ", "string": "ao"},
+      {"char": "🜇", "string": "ar"},
+      {"char": "℁", "string": "as"},
+      {"char": "Ѧ", "string": "at"},
+      {"char": "ꜷ", "string": "au"},
+      {"char": "ꜹ", "string": "au"},
+      {"char": "ꜽ", "string": "ay"},
+
+      // b
+      {"char": "𝄫", "string": "bb"},
+      {"char": "Ы", "string": "bl"},
+      {"char": "㏃", "string": "bq"},
+
+      // c
+      {"char": "㏄", "string": "cc"},
+      {"char": "㏅", "string": "cd"},
+      {"char": "₠", "string": "ce"},
+      {"char": "ꊐ", "string": "ci"},
+      {"char": "🆑", "string": "cl"},
+      {"char": "㎝", "string": "cm"},
+      {"char": "ꏳ", "string": "co"},
+      {"char": "₢", "string": "cr"},
+      {"char": "℆", "string": "cu"},
+
+      // d
+      {"char": "㍲", "string": "da"},
+      {"char": "㏈", "string": "db"},
+      {"char": "ↁ", "string": "dd"},
+      {"char": "㎗", "string": "dl"},
+      {"char": "₯", "string": "dp"},
+      {"char": "ԃ", "string": "du"},
+      {"char": "ǳ", "string": "dz"},
+
+      // e
+      {"char": "ၕ", "string": "eu"},
+      {"char": "ꉹ", "string": "ec"},
+
+      // f
+      {"char": "ﬀ", "string": "ff"},
+      {"char": "ﬁ", "string": "fi"},
+      {"char": "ﬂ", "string": "fl"},
+      {"char": "㎙", "string": "fm"},
+      {"char": "ʩ", "string": "fn"},
+      {"char": "₣", "string": "fr"},
+
+      // g
+      {"char": "㎇", "string": "gb"},
+      {"char": "㏉", "string": "gy"},
+
+      // h
+      {"char": "㏊", "string": "ha"},
+      {"char": "Њ", "string": "hb"},
+      {"char": "ᄠ", "string": "hc"},
+      {"char": "𐅪", "string": "he"},
+      {"char": "ꀨ", "string": "hh"},
+      {"char": "ῌ", "string": "hi"},
+      {"char": "ɧ", "string": "hj"},
+      {"char": "ᄟ", "string": "hl"},
+      {"char": "ꅓ", "string": "hn"},
+      {"char": "ꀞ", "string": "ho"},
+      {"char": "㏋", "string": "hp"},
+      {"char": "𐅋", "string": "ht"},
+      {"char": "Ƕ", "string": "hu"},
+      {"char": "ꀠ", "string": "hw"},
+      {"char": "㎐", "string": "hz"},
+
+      // i
+      {"char": "🆔", "string": "id"},
+      {"char": "ꍠ", "string": "ie"},
+      {"char": "ⅱ", "string": "ii"},
+      {"char": "ꆹ", "string": "ij"},
+      {"char": "㏌", "string": "in"},
+      {"char": "ⅳ", "string": "iv"},
+      {"char": "ⅸ", "string": "ix"},
+      {"char": "ꇰ", "string": "iz"},
+
+      // j
+      {"char": "ԩ", "string": "jh"},
+      {"char": "ɲ", "string": "jn"},
+
+      // k
+      {"char": "㎄", "string": "ka"},
+      {"char": "㎅", "string": "kb"},
+      {"char": "㎏", "string": "kg"},
+      {"char": "Ҝ", "string": "ki"},
+      {"char": "㏍", "string": "kk"},
+      {"char": "㎘", "string": "kl"},
+      {"char": "㎞", "string": "km"},
+      {"char": "㏀", "string": "ko"},
+      {"char": "㏏", "string": "kt"},
+      {"char": "㎸", "string": "kv"},
+      {"char": "㎾", "string": "kw"},
+
+      // l
+      {"char": "℔", "string": "lb"},
+      {"char": "ᄕ", "string": "lc"},
+      {"char": "ᇉ", "string": "le"},
+      {"char": "ᄖ", "string": "lh"},
+      {"char": "ǉ", "string": "lj"},
+      {"char": "ᄔ", "string": "ll"},
+      {"char": "㏐", "string": "lm"},
+      {"char": "㏑", "string": "ln"},
+      {"char": "ʪ", "string": "ls"},
+      {"char": "㏓", "string": "lx"},
+      {"char": "ʫ", "string": "lz"},
+
+      // m
+      {"char": "㎃", "string": "ma"},
+      {"char": "㏔", "string": "mb"},
+      {"char": "𐅕", "string": "me"},
+      {"char": "㎎", "string": "mg"},
+      {"char": "ɱ", "string": "mj"},
+      {"char": "㎖", "string": "ml"},
+      {"char": "㎜", "string": "mm"},
+      {"char": "㏁", "string": "mo"},
+      {"char": "㎳", "string": "ms"},
+      {"char": "㎷", "string": "mv"},
+      {"char": "㎽", "string": "mw"},
+
+      // n
+      {"char": "㎁", "string": "na"},
+      {"char": "㎋", "string": "nf"},
+      {"char": "🆖", "string": "ng"},
+      {"char": "ꎐ", "string": "ni"},
+      {"char": "ǌ", "string": "nj"},
+      {"char": "㎚", "string": "nm"},
+      {"char": "ꉆ", "string": "nn"},
+      {"char": "№", "string": "no"},
+      {"char": "㎱", "string": "ns"},
+      {"char": "𝆧", "string": "nt"},
+      {"char": "ល", "string": "nu"},
+      {"char": "㎵", "string": "nv"},
+      {"char": "㎻", "string": "nw"},
+
+      // o
+      {"char": "ᅂ", "string": "oc"},
+      {"char": "œ", "string": "oe"},
+      {"char": "ᅇ", "string": "oo"},
+      {"char": "ꀧ", "string": "oi"},
+      {"char": "ꆾ", "string": "oj"},
+      {"char": "🆗", "string": "ok"},
+      {"char": "🔛", "string": "on"},
+      {"char": "ၖ", "string": "os"},
+      {"char": "㍵", "string": "ov"},
+      {"char": "ѹ", "string": "oy"},
+      {"char": "ꑓ", "string": "oz"},
+
+      // p
+      {"char": "㎩", "string": "pa"},
+      {"char": "㎊", "string": "pf"},
+      {"char": "㍶", "string": "pc"},
+      {"char": "㏗", "string": "ph"},
+      {"char": "♇", "string": "pl"},
+      {"char": "㏘", "string": "pm"},
+      {"char": "㏚", "string": "pr"},
+      {"char": "㎰", "string": "ps"},
+      {"char": "㎴", "string": "pv"},
+      {"char": "㎺", "string": "pw"},
+      {"char": "℞", "string": "px"},
+
+      // q
+      {"char": "ȹ", "string": "qp"},
+
+      // r
+      {"char": "𐅏", "string": "re"},
+      {"char": "𐅇", "string": "rm"},
+      {"char": "₨", "string": "rs"},
+      {"char": "𐅈", "string": "rt"},
+      {"char": "ԅ", "string": "ru"},
+      {"char": "ꌖ", "string": "rx"},
+
+      // s
+      {"char": "℠", "string": "sm"},
+      {"char": "ꂢ", "string": "so"},
+      {"char": "㏛", "string": "sr"},
+      {"char": "ﬆ", "string": "st"},
+      {"char": "㏜", "string": "sv"},
+
+      // t
+      {"char": "Ѣ", "string": "tb"},
+      {"char": "Ћ", "string": "th"},
+      {"char": "ꉬ", "string": "tj"},
+      {"char": "ҟ", "string": "tk"},
+      {"char": "™", "string": "tm"},
+      {"char": "🝈", "string": "tr"},
+      {"char": "ʦ", "string": "ts"},
+      {"char": "₶", "string": "tt"},
+      {"char": "ԏ", "string": "tu"},
+      // u
+      {"char": "㎂", "string": "ua"},
+      {"char": "ᵫ", "string": "ue"},
+      {"char": "㎌", "string": "uf"},
+      {"char": "㎍", "string": "ug"},
+      {"char": "ﬕ", "string": "uh"},
+      {"char": "ꌩ", "string": "ui"},
+      {"char": "㎕", "string": "ul"},
+      {"char": "㎛", "string": "um"},
+      {"char": "ហ", "string": "un"},
+      {"char": "🆙", "string": "up"},
+      {"char": "㎲", "string": "us"},
+      {"char": "ﬔ", "string": "ut"},
+      {"char": "⋓", "string": "uu"},
+      {"char": "⩅", "string": "uv"},
+      {"char": "㎼", "string": "uw"},
+
+      // v
+      {"char": "⎀", "string": "va"},
+      {"char": "🝬", "string": "vb"},
+      {"char": "🜅", "string": "vf"},
+      {"char": "ⅵ", "string": "vi"},
+      {"char": "🜆", "string": "vr"},
+      {"char": "🆚", "string": "vs"},
+      {"char": "⩔", "string": "vv"},
+      {"char": "ꝡ", "string": "vy"},
+
+      // w
+      {"char": "㏝", "string": "wb"},
+      {"char": "🚾", "string": "wc"},
+      {"char": "𐊘", "string": "wi"},
+      {"char": "🝃", "string": "wt"},
+      {"char": "ʬ", "string": "ww"},
+
+      // x
+      {"char": "𐅔", "string": "xe"},
+      {"char": "ⅺ", "string": "xi"},
+      {"char": "🝍", "string": "xo"},
+      {"char": "ꋏ", "string": "xt"},
+      {"char": "〷", "string": "xx"},
+
+      // z
+      {"char": "ᇎ", "string": "zc"},
+      {"char": "ᄘ", "string": "zl"},
+      {"char": "ᄙ", "string": "zz"},
+
+      // numbers
+      {"char": "⑩", "string": "10"},
+      {"char": "⑪", "string": "11"},
+      {"char": "⑫", "string": "12"},
+      {"char": "⑬", "string": "13"},
+      {"char": "⑭", "string": "14"},
+      {"char": "⑮", "string": "15"},
+      {"char": "⑯", "string": "16"},
+      {"char": "⑰", "string": "17"},
+      {"char": "⑱", "string": "18"},
+      {"char": "⑲", "string": "19"},
+      {"char": "⑳", "string": "20"},
+      {"char": "㉑", "string": "21"},
+      {"char": "㉒", "string": "22"},
+      {"char": "㉓", "string": "23"},
+      {"char": "㉔", "string": "24"},
+      {"char": "㉕", "string": "25"},
+      {"char": "㉖", "string": "26"},
+      {"char": "㉗", "string": "27"},
+      {"char": "㉘", "string": "28"},
+      {"char": "㉙", "string": "29"},
+      {"char": "㉚", "string": "30"},
+      {"char": "㉛", "string": "31"},
+      {"char": "㉜", "string": "32"},
+      {"char": "㉝", "string": "33"},
+      {"char": "㉞", "string": "34"},
+      {"char": "㉟", "string": "35"},
+      {"char": "㊱", "string": "36"},
+      {"char": "㊲", "string": "37"},
+      {"char": "㊳", "string": "38"},
+      {"char": "㊴", "string": "39"},
+      {"char": "㊵", "string": "40"},
+      {"char": "㊶", "string": "41"},
+      {"char": "㊷", "string": "42"},
+      {"char": "㊸", "string": "43"},
+      {"char": "㊹", "string": "44"},
+      {"char": "㊺", "string": "45"},
+      {"char": "㊻", "string": "46"},
+      {"char": "㊼", "string": "47"},
+      {"char": "㊽", "string": "48"},
+      {"char": "㊾", "string": "49"},
+      {"char": "㊿", "string": "50"},
+
+      // misc
+      {"char": "∷", "string": "::"},
+      {"char": "‥", "string": "\\.\\."},
+      {"char": "⁑", "string": "\\*\\*"},
+      {"char": "≈", "string": "~~"},
+      {"char": "⩾", "string": ">="},
+      {"char": "⩽", "string": "<="},
+      {"char": "Ⅱ", "string": "\\|\\|"},
+      {"char": "⩵", "string": "=="},
+      {"char": "𐄬", "string": "\\+\\+"},
+      {"char": "⁇", "string": "\\?\\?"},
+      {"char": "⁈", "string": "\\?!"},
+      {"char": "⁉", "string": "!\\?"},
+      {"char": "‼", "string": "!!"},
+      {"char": "⸨", "string": "\\(\\("},
+      {"char": "⸩", "string": "\\)\\)"},
+    ]
+
+    function crunch() {
+
+      var text = input.value
+
+      glyph.map(function(sub) {
+
+        var match = new RegExp(sub['string'],'gi')
+
+        if (match.test(text)) {
+
+          text = text.replace(match,sub['char'])
+
+        }
+
+      })
+
+      output.value = text
+
+    }
+
+    window.addEventListener('load',crunch)
+    input.addEventListener('blur',crunch)
+    input.addEventListener('keyup',crunch)
+
+    count.innerHTML = glyph.length
+</script>
