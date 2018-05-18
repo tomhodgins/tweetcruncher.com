@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme=dark>
+<html data-theme=dark lang=en>
 <meta charset=utf-8>
 
 <title>Tweet Cruncher | Tweet Shortener | Shrink Your Tweets</title>
@@ -28,9 +28,10 @@
 <link type=image/x-icon rel="shortcut icon" href=favicon.png>
 <link rel=stylesheet href=https://fonts.googleapis.com/css?family=Fira+Sans:300,400,500,700|Source+Sans+Pro:200,300,400,600,700,900>
 <link rel=stylesheet href=https://tomhodgins.github.io/template-factory/css/basic.css>
+<link rel=stylesheet href=https://tomhodgins.github.io/template-factory/plugins/modals/data-modals.css>
 <style>
   h1 + h2 {
-  	font-size: 125%;
+  	font-size: 150%;
   }
   textarea {
     -webkit-appearance: none;
@@ -51,6 +52,93 @@
     border-color: rgba(0,150,200,1);
     box-shadow: rgba(0,150,200,.7) 0 0 .5em;
   }
+  [data-theme=dark] [data-modal] article [data-close] {
+    color: black;
+  }
+  [data-theme=dark] [data-modal] article [data-close]:hover,
+  [data-theme=dark] [data-modal] article [data-close]:focus {
+    color: #c00;
+  }
+  [data-modal] article {
+    padding: 2em;
+  }
+  [data-modal] h2 {
+    color: black;
+    margin: 0 0 .5em 0;
+    font-size: 200%;
+  }
+  [data-modal] p {
+    margin: 0;
+  }
+  /* Help Link Styles */
+  a.helpLink {
+    font-family: sans-serif;
+    display: block;
+    width: 18pt;
+    height: 18pt;
+    line-height: 18pt;
+    font-size: 12pt;
+    font-weight: 400;
+    text-align: center;
+    color: #999;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid currentColor;
+    border-radius: 100%;
+    transition: all .1s ease-in-out;
+    user-select: none;
+    cursor: pointer;
+  }
+  .helpLink:hover,
+  .helpLink:focus {
+    color: #f60;
+  }
+  .helpLink:before {
+    content: attr(data-assist);
+    display: inline-block;
+    text-align: center;
+    background: #333;
+    color: white;
+    font-weight: 400;
+    width: auto;
+    overflow: hidden;
+    white-space: pre;
+    height: auto;
+    position: absolute;
+    bottom: calc(-10pt - 31px);
+    right: 50%;
+    line-height: 1;
+    line-break: auto;
+    padding: 8px;
+    font-size: 10pt;
+    color: white;
+    transition: opacity .1s ease-in-out;
+  }
+  .helpLink:after {
+    content: '';
+    display: block;
+    border: 10px solid transparent;
+    border-right-color: #333;
+    position: absolute;
+    bottom: -25px;
+    right: 50%;
+  }
+  .helpLink:before,
+  .helpLink:after {
+    pointer-events: none;
+    opacity: 0;
+  }
+  .helpLink:hover:after,
+  .helpLink:focus:after {
+    transition: opacity .2s ease-in-out;
+  }
+  .helpLink:hover:before,
+  .helpLink:focus:before,
+  .helpLink:hover:after,
+  .helpLink:focus:after {
+    opacity: 1;
+  }
 </style>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-119384430-1"></script>
@@ -64,12 +152,24 @@
 <h1>🐥🔨<br>Tweet Cruncher</h1>
 <h2>Enter your tweet or message below and watch it magically shrink before your eyes!</h2>
 
+<a href=# class=helpLink data-assist="What is this?" onclick=spawnModal('help')>?</a>
+
 <h2>Input</h2>
 <textarea data-persist=crunch id=input placeholder="Enter text to be crunched here…"></textarea>
 
 <h2>Output</h2>
 <textarea id=output placeholder="Crunched text can be copied from here…"></textarea>
 
+<aside data-modal=help>
+  <article>
+    <button data-close onclick=destroyModal('help')>&times;</button>
+    <h2>About TweetCruncher</h2>
+    <p>Tweet Cruncher is a tweet shortener that allows you to reduce the characters in a message by swapping out some of the existing characters with <strong id=count></strong> different Unicode alternatives. Shrink your tweets, Slack messages, or any other content that needs to be condensed for character count. If you like it, you can check it out on Github!</p>
+  </article>
+  <span data-overlay onclick=destroyModal('help')></span>
+</aside>
+
+<script src=https://tomhodgins.github.io/template-factory/plugins/modals/data-modals.js></script>
 <script>
   var input = document.getElementById('input')
   var output = document.getElementById('output')
